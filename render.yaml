@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: mijuy-app
+    runtime: php
+    plan: free
+    buildCommand: composer install --no-dev
+    startCommand: heroku-php-apache2 public/
+    envVars:
+      - key: APP_KEY
+        value: base64:kJ+h67iM4YelmwIxR0VIP804BfAo00eOGy0XQMuaaCQ=
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: gateway01us-east-1.prod.aws.tidbcloud.com
+      - key: DB_PORT
+        value: 4000
+      - key: DB_DATABASE
+        value: mijuy
+      - key: DB_USERNAME
+        value: 32uit7z6bZQmX61.root
+      - key: DB_PASSWORD
+        value: iuRv84flVGi5Cup
+      - key: DB_SSLMODE
+        value: required
