@@ -3,7 +3,7 @@ services:
     name: mijuy-app
     runtime: php
     plan: free
-    buildCommand: composer install --no-dev
+    buildCommand: composer install --no-dev && npm install && npm run build
     startCommand: heroku-php-apache2 public/
     envVars:
       - key: APP_KEY
