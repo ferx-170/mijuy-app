@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class FoodController extends Controller
+class FoodController extends Controller 
 {
     // ============ HOME ============
     public function index()
@@ -76,11 +76,16 @@ class FoodController extends Controller
             $content = preg_replace('/```json\s*|\s*```/', '', $content);
             $result = json_decode($content, true);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                Log::error('JSON inválido: ' . $content);
-                return back()->with('error', 'La IA devolvió un formato inválido.');
+             if (json_last_error() !== JSON_ERROR_NONE || !isset($result['es_comida'])) {
+                Log::error('JSON inválido o estructura incorrecta: ' . $content);
+                return back()->with('error', 'La IA devolvió un formato inválido. Intenta nuevamente.');
             }
 
+            // 2. VALIDAR QUE REALMENTE SEA COMIDA
+            if ($result['es_comida'] === false) {
+                return back()->with('error', 'La imagen no contiene alimentos. Por favor, sube una foto clara de un plato o ingredientes.');
+            }
+            
             // ============ GUARDAR EN BD ============
             $receta = DB::transaction(function () use ($result, $imageBase64) {
                 $usuarioId = Auth::id();
@@ -181,14 +186,19 @@ class FoodController extends Controller
     private function buildPrompt(): string
     {
         return <<<PROMPT
-Eres un asistente nutricional y culinario experto. Analiza la imagen de los ingredientes.
+Eres un estricto asistente nutricional y culinario experto. Analiza la imagen que te envío.
 
-Reglas:
-1. Identifica todos los ingredientes visibles.
-2. Si faltan ingredientes para una receta completa, sugiérelos.
-3. Devuelve ÚNICAMENTE un JSON válido con esta estructura EXACTA:
-
+REGLA DE ORO: 
+Primero, evalúa si la imagen contiene ingredientes o comida real (platos, frutas, verduras, carnes, etc.).
+Si la imagen NO contiene comida (por ejemplo: personas, animales, hardware, ropa, paisajes, texto, objetos), DEBES devolver ÚNICAMENTE este JSON de error:
 {
+  "es_comida": false,
+  "error": "La imagen no contiene alimentos válidos para analizar."
+}
+
+Si la imagen SÍ contiene comida, procede a generar la receta y devuelve ÚNICAMENTE un JSON válido con esta estructura EXACTA:
+{
+  "es_comida": true,
   "nombre": "Nombre del plato",
   "descripcion": "Breve descripción (2 líneas máx)",
   "ingredientes": ["Ingrediente 1: cantidad", "..."],
@@ -213,4 +223,5 @@ Reglas:
 No incluyas texto fuera del JSON. Los pasos deben incluir tiempos y temperaturas.
 PROMPT;
     }
+    
 }
