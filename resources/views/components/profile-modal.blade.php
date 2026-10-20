@@ -397,8 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
         save.classList.add('load'); save.classList.remove('dirty'); save.disabled = true; saveTxt.textContent = 'Guardando...';
     });
 
-    /* ---------- Reabrir si Laravel devolvió errores o mensaje de éxito ---------- */
-    @if($errors->hasAny(array_merge($infoFields, $secFields)) || session('success'))
+    /* ---------- Reabrir si Laravel devolvió errores ---------- */
+    @if($errors->hasAny(array_merge($infoFields, $secFields)))
         window.bootstrap && bootstrap.Modal.getOrCreateInstance(modal).show();
     @endif
 });
