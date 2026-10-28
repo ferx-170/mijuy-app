@@ -57,7 +57,7 @@
                         </div>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-gray-900">+2,000 usuarios</p>
+                        <p class="text-xl font-bold text-gray-900">Unete a nosotros</p>
                         <p class="text-sm text-gray-500">confían en MIJUY</p>
                     </div>
                 </div>
